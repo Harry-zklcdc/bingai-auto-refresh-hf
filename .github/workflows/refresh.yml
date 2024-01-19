@@ -1,0 +1,28 @@
+name: HuggingFace Auto Refresh
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Refresh
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Commit
+        run: |
+          date "+%Y-%m-%d %H:%M:%S" >> README.md
+          git config --global user.email $COMMIT_EMAIL
+          git config --global user.name $GITHUB_REPOSITORY_OWNER
+          git add README.md
+          git commit -m "[Refresh] 🤗 HuggingFace"
+          git push -f https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/$HF_USERNAME/$SPACE_NAME main
+        env:
+          HF_USERNAME: ${{ vars.HF_USERNAME }}
+          SPACE_NAME: ${{ vars.SPACE_NAME }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          COMMIT_EMAIL: ${{ vars.COMMIT_EMAIL }}
+
+      
