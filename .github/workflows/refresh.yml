@@ -13,10 +13,11 @@ jobs:
 
       - name: Commit
         run: |
-          date "+%Y-%m-%d %H:%M:%S" >> README.md
+          NOWDATE=`date "+%Y-%m-%d %H:%M:%S"`
+          sed -i "9 a RUN echo $NOWDATE\n" Dockerfile
           git config --global user.email $COMMIT_EMAIL
           git config --global user.name $GITHUB_REPOSITORY_OWNER
-          git add README.md
+          git add Dockerfile
           git commit -m "[Refresh] 🤗 HuggingFace"
           git push -f https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/$HF_USERNAME/$SPACE_NAME main
         env:
@@ -24,5 +25,3 @@ jobs:
           SPACE_NAME: ${{ vars.SPACE_NAME }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           COMMIT_EMAIL: ${{ vars.COMMIT_EMAIL }}
-
-      
