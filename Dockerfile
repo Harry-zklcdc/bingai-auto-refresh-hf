@@ -1,3 +1,5 @@
+FROM cloudflare/cloudflared:latest AS cfd
+
 FROM selenium/node-edge
 
 ENV GBP_USER ${GBP_USER:-gbp}
@@ -26,6 +28,8 @@ COPY supervisor.conf /etc/supervisor/conf.d/selenium.conf
 
 RUN groupadd -g $GBP_USER_ID $GBP_USER
 RUN useradd -rm -G sudo -u $GBP_USER_ID -g $GBP_USER_ID $GBP_USER
+
+COPY --from=cfd --chown=$GBP_USER /usr/local/bin/cloudflared /app/
 
 RUN mkdir -p /tmp/edge
 RUN chown "${GBP_USER_ID}:${GBP_USER_ID}" /var/run/supervisor /var/log/supervisor
